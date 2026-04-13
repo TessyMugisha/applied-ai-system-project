@@ -17,13 +17,17 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
+![Terminal output showing recommendations](music.png)
+Real-world recommendation systems like Spotify score each song based on how well it matches a user's taste, then rank all the scores to surface the best ones. My version does the same thing. It scores songs using features like energy and mood, then prioritizes the ranking step to make sure the most relevant songs always come out on top.
 Explain your design in plain language.
+The program loads every song from songs.csv, scores each one by adding up to 2.0 points for a genre match, 1.0 for a mood match, up to 1.5 points based on how close the song's energy is to the user's target, and a 0.5 bonus if the user likes acoustic songs and the song is acoustic, then sorts all the scores from highest to lowest and returns the top 5 matches with a short explanation of why each was picked. This system will over-prioritize genre — a song that perfectly matches the user's mood, energy, and acoustic taste but belongs to a different genre scores at most 3.0, while a genre-matched song with nothing else in common can still outscore it at 2.0, meaning a mediocre genre match will consistently beat a near-perfect cross-genre match.
 
 Some prompts to answer:
 
 - What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
+  Song uses: title, artist, genre, mood, energy, valence, acousticness, tempo, and danceability.
 - What information does your `UserProfile` store
+UserProfile uses: favorite genre, favorite mood, target energy level, and whether they like acoustic music.
 - How does your `Recommender` compute a score for each song
 - How do you choose which songs to recommend
 
