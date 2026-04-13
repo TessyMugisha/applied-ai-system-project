@@ -61,13 +61,19 @@ def load_songs(csv_path: str) -> List[Dict]:
     return songs
 
 def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
-    """Score a song 0–5 using genre (+2), mood (+1), energy proximity (+1.5), and acoustic bonus (+0.5)."""
+    """Score a song using genre (+1), mood (+1), energy proximity (+3.0 max), and acoustic bonus (+0.5).
+
+    EXPERIMENT — Weight Shift:
+      Genre weight halved:  2.0 → 1.0
+      Energy weight doubled: 1.5 → 3.0 (formula: 3.0 * (1 - |song_energy - target_energy|))
+    New theoretical max: 1.0 + 1.0 + 3.0 + 0.5 = 5.5  (all terms still positive and bounded)
+    """
     score = 0.0
     reasons = []
 
-    # Rule 1 — Genre match (+2.0)
+    # Rule 1 — Genre match (+1.0, halved from original +2.0)
     if song["genre"] == user_prefs.get("favorite_genre", ""):
-        score += 2.0
+        score += 1.0
         reasons.append(f"genre match ({song['genre']})")
 
     # Rule 2 — Mood match (+1.0)
@@ -75,9 +81,9 @@ def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
         score += 1.0
         reasons.append(f"mood match ({song['mood']})")
 
-    # Rule 3 — Energy proximity (up to +1.5)
+    # Rule 3 — Energy proximity (up to +3.0, doubled from original +1.5)
     energy_diff = abs(song["energy"] - user_prefs.get("target_energy", 0.5))
-    energy_score = max(0.0, 1.5 * (1.0 - energy_diff))
+    energy_score = max(0.0, 3.0 * (1.0 - energy_diff))
     score += energy_score
     reasons.append(f"energy score {energy_score:.2f} (diff={energy_diff:.2f})")
 

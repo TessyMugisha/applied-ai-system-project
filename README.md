@@ -78,6 +78,19 @@ Use this section to document the experiments you ran. For example:
 - What happened when you added tempo or valence to the score
 - How did your system behave for different types of users
 
+### System Evaluation — Adversarial Profiles
+
+To stress-test the scoring logic, I ran four adversarial (edge-case) user profiles designed to expose unexpected or surprising behavior:
+
+| Profile | What it tests |
+|---|---|
+| **Sad Bangers** | `energy: 0.95` + `mood: sad` — does mood match outweigh a huge energy gap? |
+| **Genre Ghost** | Genre `"classical"` doesn't exist in the catalog — the +2.0 bonus never fires |
+| **Acoustic Metalhead** | `likes_acoustic: True` + `genre: metal` — genre wins even when the song has low acousticness |
+| **Valence Blindspot** | `target_valence: 0.95` — valence is never scored, so it is silently ignored |
+
+![Terminal output showing adversarial profile recommendations](music2.png)
+
 ---
 
 ## Limitations and Risks
