@@ -111,5 +111,4 @@ You will go deeper on this in your model card.
 
 [**Full Model Card**](model_card.md)
 
-I didn't realize how much one weight could control everything. Genre being worth 2 points meant the other features barely got a say — I only noticed when I ran the adversarial profiles and watched it play out. That was the moment it actually clicked. Building this also changed how I think about Spotify. When it keeps recommending the same vibe, it's probably not learning you — it's just amplifying whatever signal you gave it first.
 
