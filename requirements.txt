@@ -1,5 +1,6 @@
-anthropic
+google-generativeai
 pandas
 pytest
+python-dotenv
 scikit-learn
 streamlit

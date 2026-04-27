@@ -24,7 +24,6 @@ This project is a music recommendation system that scores songs from a catalog a
 
 ---
 
-## Original Project (Modules 1–3)
 
 **Project:** Music Recommender Simulation
 
@@ -67,12 +66,14 @@ The system has two recommendation modes that share the same song catalog:
    pip install -r requirements.txt
    ```
 
-4. **Set your Anthropic API key to enable RAG mode:**
+4. **Set your Gemini API key to enable RAG mode:**
 
-   ```bash
-   export ANTHROPIC_API_KEY=sk-ant-...   # Mac / Linux
-   set ANTHROPIC_API_KEY=sk-ant-...      # Windows CMD
-   $env:ANTHROPIC_API_KEY="sk-ant-..."   # Windows PowerShell
+   - Copy `.env.example` to `.env`
+   - Get a free key at [aistudio.google.com/app/api-keys](https://aistudio.google.com/app/api-keys)
+   - Paste it into `.env`:
+
+   ```
+   GEMINI_API_KEY=your_key_here
    ```
 
    The app works without this key — it will run the rule-based scoring mode and print a clear message explaining how to enable RAG.

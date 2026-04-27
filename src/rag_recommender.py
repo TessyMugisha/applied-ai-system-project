@@ -116,16 +116,24 @@ def retrieve(query: str, vectorizer, matrix, songs: List[Dict], k: int = 5) -> L
     return retrieved
 
 
-def generate(query: str, retrieved_songs: List[Dict], client) -> str:
+def generate(query: str, retrieved_songs: List[Dict], api_key: str) -> str:
     """
-    Call Claude API with retrieved songs as context and return a grounded recommendation.
+    Call Gemini API with retrieved songs as context and return a grounded recommendation.
 
-    Claude must only recommend from the retrieved list, ensuring the generated
+    Gemini must only recommend from the retrieved list, ensuring the generated
     response is fully anchored to the retrieval step.
     """
     if not retrieved_songs:
         logger.warning("No songs retrieved — returning fallback message without calling API")
         return "No relevant songs were found in the catalog for this query."
+
+    try:
+        import google.generativeai as genai
+    except ImportError as exc:
+        raise ImportError(
+            "google-generativeai is required for RAG generation. "
+            "Install it with: pip install google-generativeai"
+        ) from exc
 
     context = "\n".join(
         f"  [{i + 1}] \"{s['title']}\" by {s['artist']} | "
@@ -147,16 +155,14 @@ def generate(query: str, retrieved_songs: List[Dict], client) -> str:
         f"- Keep your tone friendly and conversational."
     )
 
-    logger.info("Calling Claude API with %d songs as context", len(retrieved_songs))
+    logger.info("Calling Gemini API with %d songs as context", len(retrieved_songs))
 
-    response = client.messages.create(
-        model="claude-haiku-4-5-20251001",
-        max_tokens=500,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
 
-    text = response.content[0].text
-    logger.info("Claude response: %d characters", len(text))
+    text = response.text
+    logger.info("Gemini response: %d characters", len(text))
     return text
 
 
@@ -165,10 +171,10 @@ def rag_recommend(
     songs: List[Dict],
     vectorizer,
     matrix,
-    client,
+    api_key: str,
     k: int = 5,
 ) -> Tuple[str, List[Dict]]:
-    """Full RAG pipeline: retrieve relevant songs from catalog, then generate via Claude."""
+    """Full RAG pipeline: retrieve relevant songs from catalog, then generate via Gemini."""
     retrieved = retrieve(query, vectorizer, matrix, songs, k=k)
-    recommendation = generate(query, retrieved, client)
+    recommendation = generate(query, retrieved, api_key)
     return recommendation, retrieved

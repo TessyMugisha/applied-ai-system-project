@@ -7,12 +7,16 @@ Usage:
     python -m src.main --mode rag     # AI-generated RAG recommendations only
     python -m src.main --mode all     # explicit: both modes (same as default)
 
-RAG mode requires the ANTHROPIC_API_KEY environment variable to be set.
+RAG mode requires GEMINI_API_KEY — set it in a .env file (copy .env.example).
 """
 
 import argparse
 import logging
 import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from .recommender import load_songs, recommend_songs
 
@@ -119,29 +123,27 @@ def run_rag_mode(songs: list) -> None:
 
     Retrieval: TF-IDF cosine similarity over song descriptions selects the
                most relevant songs for each natural language query.
-    Generation: Claude receives ONLY the retrieved songs and must recommend
+    Generation: Gemini receives ONLY the retrieved songs and must recommend
                 from them, grounding every suggestion in catalog data.
     """
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         print(
-            "\n[RAG mode skipped] ANTHROPIC_API_KEY is not set.\n"
-            "  Set it with:  export ANTHROPIC_API_KEY=sk-ant-...\n"
-            "  Then re-run:  python -m src.main --mode rag"
+            "\n[RAG mode skipped] GEMINI_API_KEY is not set.\n"
+            "  1. Copy .env.example to .env\n"
+            "  2. Paste your key from https://aistudio.google.com/app/api-keys\n"
+            "  3. Re-run: python -m src.main --mode rag"
         )
-        logger.warning("RAG mode skipped: ANTHROPIC_API_KEY not set")
+        logger.warning("RAG mode skipped: GEMINI_API_KEY not set")
         return
 
     try:
-        import anthropic
         from .rag_recommender import build_index, rag_recommend
     except ImportError as exc:
         print(f"\n[RAG mode error] Missing dependency: {exc}")
-        print("  Install with: pip install anthropic scikit-learn")
+        print("  Install with: pip install google-generativeai scikit-learn")
         logger.error("Import error in RAG mode: %s", exc)
         return
-
-    client = anthropic.Anthropic(api_key=api_key)
 
     try:
         vectorizer, matrix = build_index(songs)
@@ -152,7 +154,7 @@ def run_rag_mode(songs: list) -> None:
 
     print("\n" + "#" * 50)
     print("  RAG MODE — AI-Generated Recommendations")
-    print("  (Retrieve → Augment → Generate via Claude)")
+    print("  (Retrieve → Augment → Generate via Gemini)")
     print("#" * 50)
 
     for label, query in RAG_QUERIES.items():
@@ -167,16 +169,12 @@ def run_rag_mode(songs: list) -> None:
                 songs=songs,
                 vectorizer=vectorizer,
                 matrix=matrix,
-                client=client,
+                api_key=api_key,
                 k=5,
             )
-        except anthropic.APIStatusError as exc:
-            print(f"  [API error] {exc.status_code}: {exc.message}")
-            logger.error("Anthropic API error for '%s': %s", label, exc)
-            continue
         except Exception as exc:
-            print(f"  [Error] RAG failed: {exc}")
-            logger.exception("RAG pipeline failed for profile '%s'", label)
+            print(f"  [API error] RAG failed: {exc}")
+            logger.error("Gemini API error for '%s': %s", label, exc)
             continue
 
         print(f"\n  Retrieved context ({len(retrieved)} songs):")
@@ -185,7 +183,7 @@ def run_rag_mode(songs: list) -> None:
                   f"[{s['genre']}, {s['mood']}, energy={s['energy']}, "
                   f"sim={s['_similarity']}]")
 
-        print("\n  Claude's recommendation:\n")
+        print("\n  Gemini's recommendation:\n")
         for line in recommendation.splitlines():
             print(f"    {line}")
         print("-" * 50)
