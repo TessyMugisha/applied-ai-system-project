@@ -56,7 +56,21 @@ I'd add valence to the scoring since it's already in the data but does nothing r
 
 ---
 
-## 9. Personal Reflection  
+## 9. RAG Enhancement (Module 4 Addition)
+
+For the final version I added Retrieval-Augmented Generation to make the system more advanced. Instead of only taking a structured profile, the app now accepts a natural language query like "relaxing jazz for late night, low energy, acoustic." It uses a TF-IDF index built over synonym-enriched song descriptions to retrieve the most relevant songs from the catalog, then passes those retrieved songs to Claude (claude-haiku-4-5) as context. Claude can only recommend from the songs it was given — it cannot invent songs that do not exist. This grounding step is the key difference between RAG and just asking an AI a question directly.
+
+The biggest challenge was vocabulary mismatch. The catalog uses labels like "relaxed" but a user might type "calming." I solved this by expanding each song's description with synonyms before indexing, which helped TF-IDF bridge that gap without needing an embedding model.
+
+**AI collaboration — one helpful, one flawed:**
+
+The helpful suggestion was adding synonym expansions to song descriptions for TF-IDF retrieval. Without that, the retriever would miss obvious matches because the vocabulary in the catalog and in a natural language query almost never overlaps exactly. That fix made RAG actually work.
+
+The flawed suggestion was in the OOP `Recommender` class. The `recommend()` method was left as a stub that returns `songs[:k]` with no sorting, but the unit test still passed because the right song happened to be first in the list. The AI flagged the test as passing without catching that the underlying logic was never actually implemented. I only noticed by reading the code carefully instead of trusting the green checkmark.
+
+---
+
+## 10. Personal Reflection  
 
 The biggest learning moment was seeing how much one weight can shut everything else out. Genre being worth 2 points meant the other features barely got a say. I didn't notice until I ran the adversarial profiles and watched it happen — that's when it actually clicked for me.
 
