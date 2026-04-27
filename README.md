@@ -1,5 +1,23 @@
 # Music Recommender with RAG
 
+## Video Walkthrough
+
+[![Loom Walkthrough](https://img.shields.io/badge/Watch-Loom%20Walkthrough-purple?logo=loom)](YOUR_LOOM_LINK_HERE)
+
+> 📹 **[Watch the demo on Loom](YOUR_LOOM_LINK_HERE)** — shows end-to-end scoring, RAG recommendations, and guardrail behavior.
+
+---
+
+## Portfolio
+
+**GitHub:** [github.com/TessyMugisha/applied-ai-system-project](https://github.com/TessyMugisha/applied-ai-system-project)
+
+**What this project says about me as an AI engineer:**
+
+I built a music recommender that works in two modes — a rule-based scorer and a RAG pipeline that retrieves songs before asking Claude to respond — and the choice to keep both was intentional. I could have just added Claude and called it done, but I wanted to understand what the AI was actually contributing versus what the rules already handled. That instinct to compare, test edge cases, and document where the system silently fails rather than hiding it is how I approach engineering problems. I am not just interested in making AI work — I am interested in knowing exactly why it works, and being honest when it does not.
+
+---
+
 ## Title and Summary
 
 This project is a music recommendation system that scores songs from a catalog against user taste profiles and, in its enhanced form, uses **Retrieval-Augmented Generation (RAG)** to produce natural-language recommendations grounded in real catalog data. It matters because it demonstrates how rule-based AI and generative AI can work together — the retriever ensures Claude only recommends songs that actually exist, while Claude explains *why* each song fits in a way a scoring table cannot.
@@ -24,57 +42,7 @@ The system has two recommendation modes that share the same song catalog:
 
 ### System Diagram
 
-```mermaid
-flowchart TD
-    CSV[(songs.csv\n20 songs)] --> LOAD[load_songs\nrecommender.py]
-
-    USER[Structured User Profile\ngenre · mood · energy · acoustic]
-    QUERY[Natural Language Query\ne.g. relaxing jazz late night]
-
-    LOAD --> SCORE_PIPE
-    LOAD --> BUILD
-
-    USER --> SCORE_PIPE
-    QUERY --> RETRIEVE
-
-    subgraph SCORE_PIPE[Scores Mode — Rule-Based]
-        direction TB
-        SCORE[score_song\ngenre +1 · mood +1 · energy up to +3 · acoustic +0.5]
-        RANK[recommend_songs\nsort descending · top-k]
-        SCORE --> RANK
-    end
-
-    subgraph RAG_MODE[RAG Mode — AI-Augmented]
-        direction TB
-        BUILD[build_index\nTF-IDF vectorizer over\nsynonym-enriched descriptions]
-        RETRIEVE[retrieve\ncosine similarity · top-k songs]
-        GENERATE[generate\nClaude claude-haiku-4-5\ngrounded in retrieved context only]
-        BUILD --> RETRIEVE
-        RETRIEVE --> GENERATE
-    end
-
-    RANK --> OUT1[Ranked songs\nwith scores and rule explanations]
-    GENERATE --> OUT2[AI recommendation\nanchored to catalog data]
-
-    subgraph EVAL[Testing and Evaluation]
-        direction TB
-        PYTEST[pytest unit tests\n2 automated checks]
-        ADV[7 Adversarial Profiles\nedge-case stress testing]
-        LOG[Logging and Guardrails\nerror handling at every step]
-        HUMAN[Human Review\nof AI output quality]
-    end
-
-    PYTEST -.->|validates| SCORE_PIPE
-    ADV -.->|stress-tests| RAG_MODE
-    LOG -.->|monitors| RAG_MODE
-    HUMAN -.->|evaluates| OUT2
-```
-
 ![System Architecture Diagram](assets/mermaidLive.png)
-
-> **Mermaid AI prompt:** Paste the code block above at [mermaid.live](https://mermaid.live) to render an interactive diagram, or include it in any Markdown file rendered by GitHub (it renders natively).
-
----
 
 ## Setup Instructions
 
