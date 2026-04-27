@@ -2,9 +2,9 @@
 
 ## Video Walkthrough
 
-[![Loom Walkthrough](https://img.shields.io/badge/Watch-Loom%20Walkthrough-purple?logo=loom)](YOUR_LOOM_LINK_HERE)
+[![Loom Walkthrough](https://img.shields.io/badge/Watch-Loom%20Walkthrough-purple?logo=loom)](https://www.loom.com/share/c2f54c6782a545cb978504ccfa60246a)
 
-> 📹 **[Watch the demo on Loom](YOUR_LOOM_LINK_HERE)** — shows end-to-end scoring, RAG recommendations, and guardrail behavior.
+> 📹 **[Watch the demo on Loom](https://www.loom.com/share/c2f54c6782a545cb978504ccfa60246a)** — shows end-to-end scoring, RAG recommendations, and guardrail behavior.
 
 ---
 
