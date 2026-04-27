@@ -128,11 +128,11 @@ def generate(query: str, retrieved_songs: List[Dict], api_key: str) -> str:
         return "No relevant songs were found in the catalog for this query."
 
     try:
-        import google.generativeai as genai
+        from groq import Groq
     except ImportError as exc:
         raise ImportError(
-            "google-generativeai is required for RAG generation. "
-            "Install it with: pip install google-generativeai"
+            "groq is required for RAG generation. "
+            "Install it with: pip install groq"
         ) from exc
 
     context = "\n".join(
@@ -147,22 +147,25 @@ def generate(query: str, retrieved_songs: List[Dict], api_key: str) -> str:
         f"User request: \"{query}\"\n\n"
         f"Songs retrieved from catalog:\n{context}\n\n"
         f"Instructions:\n"
-        f"- Select the 1–3 best matches from the retrieved list for this user's request.\n"
-        f"- For each chosen song, write 1–2 sentences explaining WHY it fits — "
+        f"- Select the 1-3 best matches from the retrieved list for this user's request.\n"
+        f"- For each chosen song, write 1-2 sentences explaining WHY it fits -- "
         f"reference its specific attributes (mood, genre, energy, acousticness).\n"
         f"- Do NOT recommend any song that is not in the retrieved list.\n"
         f"- If none of the retrieved songs are a good fit, say so clearly and explain the mismatch.\n"
         f"- Keep your tone friendly and conversational."
     )
 
-    logger.info("Calling Gemini API with %d songs as context", len(retrieved_songs))
+    logger.info("Calling Groq API with %d songs as context", len(retrieved_songs))
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    response = model.generate_content(prompt)
+    client = Groq(api_key=api_key)
+    response = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=500,
+    )
 
-    text = response.text
-    logger.info("Gemini response: %d characters", len(text))
+    text = response.choices[0].message.content
+    logger.info("Groq response: %d characters", len(text))
     return text
 
 

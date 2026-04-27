@@ -66,14 +66,14 @@ The system has two recommendation modes that share the same song catalog:
    pip install -r requirements.txt
    ```
 
-4. **Set your Gemini API key to enable RAG mode:**
+4. **Set your Groq API key to enable RAG mode:**
 
    - Copy `.env.example` to `.env`
-   - Get a free key at [aistudio.google.com/app/api-keys](https://aistudio.google.com/app/api-keys)
+   - Get a free key at [console.groq.com](https://console.groq.com) (no credit card needed)
    - Paste it into `.env`:
 
    ```
-   GEMINI_API_KEY=your_key_here
+   GROQ_API_KEY=your_key_here
    ```
 
    The app works without this key — it will run the rule-based scoring mode and print a clear message explaining how to enable RAG.

@@ -126,22 +126,22 @@ def run_rag_mode(songs: list) -> None:
     Generation: Gemini receives ONLY the retrieved songs and must recommend
                 from them, grounding every suggestion in catalog data.
     """
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         print(
-            "\n[RAG mode skipped] GEMINI_API_KEY is not set.\n"
+            "\n[RAG mode skipped] GROQ_API_KEY is not set.\n"
             "  1. Copy .env.example to .env\n"
-            "  2. Paste your key from https://aistudio.google.com/app/api-keys\n"
+            "  2. Get a free key from https://console.groq.com\n"
             "  3. Re-run: python -m src.main --mode rag"
         )
-        logger.warning("RAG mode skipped: GEMINI_API_KEY not set")
+        logger.warning("RAG mode skipped: GROQ_API_KEY not set")
         return
 
     try:
         from .rag_recommender import build_index, rag_recommend
     except ImportError as exc:
         print(f"\n[RAG mode error] Missing dependency: {exc}")
-        print("  Install with: pip install google-generativeai scikit-learn")
+        print("  Install with: pip install groq scikit-learn")
         logger.error("Import error in RAG mode: %s", exc)
         return
 
@@ -154,7 +154,7 @@ def run_rag_mode(songs: list) -> None:
 
     print("\n" + "#" * 50)
     print("  RAG MODE — AI-Generated Recommendations")
-    print("  (Retrieve → Augment → Generate via Gemini)")
+    print("  (Retrieve -> Augment -> Generate via Gemini)")
     print("#" * 50)
 
     for label, query in RAG_QUERIES.items():
@@ -174,7 +174,7 @@ def run_rag_mode(songs: list) -> None:
             )
         except Exception as exc:
             print(f"  [API error] RAG failed: {exc}")
-            logger.error("Gemini API error for '%s': %s", label, exc)
+            logger.error("Groq API error for '%s': %s", label, exc)
             continue
 
         print(f"\n  Retrieved context ({len(retrieved)} songs):")
